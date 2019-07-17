@@ -1,5 +1,13 @@
-require 'rails_helper'
+require 'spec_helper'
 
 RSpec.describe User, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  let(:user) {
+    create(:user)
+  }
+  before { user.save! }
+  subject { user }
+  it { is_expected.to respond_to :email }
+  it { is_expected.to respond_to :rates }
+  it { is_expected.to respond_to :photos }
+  it { is_expected.to respond_to :comments }
 end

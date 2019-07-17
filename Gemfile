@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
-gem 'bootstrap-sass', '2.3.2.0'
+# gem 'bootstrap-sass', '2.3.2.0'
+gem 'bootstrap', '~> 4.3.1'
 gem 'bootstrap-will_paginate', '0.0.9'
 gem 'coffee-rails', '~> 4.1.0'
 gem 'devise'
