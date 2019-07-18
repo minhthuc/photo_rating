@@ -13,7 +13,7 @@ namespace :db do
     users = User.all.limit(7)
     10.times do
       description = Faker::Lorem.sentence(5)
-      title = Faker::Lorem.sentence(10)
+      title = Faker::Lorem.sentence(3)
       location = Faker::Lorem.sentence(15)
       users.each { |user| user.photos.create!(description: description, title: title, location: location) }
     end
