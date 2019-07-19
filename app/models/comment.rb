@@ -1,5 +1,5 @@
 class Comment < ActiveRecord::Base
-  MAX_LENGTH_CONTENT= 255
+  MAX_LENGTH_CONTENT = 255
 
   belongs_to :user
   belongs_to :photo

@@ -12,11 +12,12 @@ class Photo < ActiveRecord::Base
   validates :description, length: { maximum: MAX_LENG_CONTENT }, presence: true
   validates :location, presence: true
 
+  default_scope -> { order('created_at DESC') }
+
   def category(category, photo)
     CategoriPhoto.new(photo_id: photo.id, category_id: category.id).save!
   end
 
-  # @return [integer]
   def get_score
     if is_update_score
       photo_score

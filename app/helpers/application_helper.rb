@@ -33,4 +33,5 @@ module ApplicationHelper
     end
     return string.html_safe
   end
+
 end

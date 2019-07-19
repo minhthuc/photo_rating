@@ -1,5 +1,5 @@
 <section>
-  <div class="container">
+  <div class="container" id="home_element">
     <div class="row">
       <div class="col-md-8">
         <div class="panel panel-default">
@@ -26,7 +26,48 @@
             <% end %>
           </div>
         </div>
-        <%= render @photos %>
+        {{photos_get}}
+        <div v-for="(photo, index) in photos" class="panel panel-default post" id="home-element">
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-sm-2">
+                <a href="profile.html"
+                   class="post-avatar thumbnail">
+                  <%= image_tag("user.png") %>
+                  <div class="text-center">{{photo.user_email}}</div>
+                </a>
+              </div>
+              <div class="col-sm-10">
+                <div class="pointer text-center">
+                  <img v-bind:src="photo.location" v-bind:alt="photo.title">
+                </div>
+                <div class="pointer-border">
+                  <h4 class="text-center">
+                    {{photo.title}}
+                  </h4>
+                  <p>
+                    {{photo.description}}
+                  </p>
+                </div>
+                <p class="post-actions">
+                  <star-rating v-bind:increment="0.1" v-bind:max-rating="5"
+                    inactive-color="#000" active-color="yellow" v-bind:star-size="20"
+                    v-bind:rating="photo.photo_score"
+                     @rating-selected="setRating($event, index)">
+                  </star-rating>
+                  <i v-if="photo.loading" class="fas fa-circle-notch fa-spin"></i>
+                  <a href="#">Vote</a>
+                  <a href="#">Comment</a>
+                </p>
+                </div>
+            </div>
+          </div>
+        </div>
+
+        <%# @photos.each do |photo| %>
+        <%#= render partial: "photos/photo", locals:{photo: photo} %>
+        <%# end %>
+        <%#= render @photos %>
 
       </div>
       <div class="col-md-4">
@@ -73,4 +114,5 @@
   </div>
 </section>
 <script>
+
 </script>

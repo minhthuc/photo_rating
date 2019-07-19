@@ -15,16 +15,45 @@
 //= require turbolinks
 //= require_tree .
 $(document).ready(f => {
-  var app = new Vue({
-    el: '#home-element',
+  Vue.component('star-rating', VueStarRating.default);
+  new Vue({
+    el: '#home_element',
     data: {
-      message: "hello"
+      rating: 3,
+      photos:[]
     },
-    components: {
-      stars: {
-        props: ['score'],
-        template: `<h3>{{score}}</h3>`
+    methods: {
+      setRating: function(rating, index){
+        let self = this;
+        let photo_id = self.photos[index].id;
+        rating = Math.ceil(rating)
+        self.photos[index].loading = true;
+        $.post("/vote", {photo_id, rating}).done(function(respone){
+          self.photos[index].photo_score = parseInt(respone)
+          self.photos[index].loading = false;
+          console.log(respone)
+        }).error(er=>{
+          console.log(er)
+        })
+      },
+      comment: function (value, index) {
+
       }
-    }
-  })
+    },
+    computed:{
+      photos_get:function (){
+        let self = this;
+        $.get("/photos").done(respose=>{
+          self.photos = respose.map(f=>{
+            f.loading = false;
+            return f
+          })
+          return
+        }).error(er=>{
+
+        })
+      }
+    },
+
+  });
 })

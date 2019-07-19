@@ -5,27 +5,35 @@
         <a href="profile.html"
            class="post-avatar thumbnail">
           <%= image_tag("user.png") %>
-          <div class="text-center">DevUser1</div>
+          <div class="text-center"><%= photo["user_email"] %></div>
         </a>
-        <div class="likes text-center">7 Likes</div>
+<!--        <div class="likes text-center">7 Likes</div>-->
       </div>
       <div class="col-sm-10">
         <!--                <div class="bubble">-->
         <div class="pointer text-center">
-          <%= image_tag(photo.location, alt: photo.title) %>
+          <%= image_tag(photo["location"], alt: photo["title"]) %>
         </div>
         <div class="pointer-border">
           <h4 class="text-center">
-            <%= photo.title %>
+            <%= photo["title"] %>
           </h4>
           <p>
-            <%= photo.description %>
+            <%= photo["description"] %>
           </p>
         </div>
         <!--                </div>-->
-        <p class="post-actions"><a href="#"></a>
-          <%= photo.photo_score %>
-          <%= Star_count photo.photo_score %>
+        <p class="post-actions">
+
+          <%#= Star_count photo["photo_score"] %>
+          <star-rating v-bind:increment="0.1"
+                       v-bind:max-rating="5"
+                       inactive-color="#000"
+                       active-color="#f00"
+                       v-bind:star-size="20">
+          </star-rating>
+          <a href="#">Vote</a>
+          <a href="#">Comment</a>
         </p>
         <div class="comment-form">
           <form class="form-inline">
