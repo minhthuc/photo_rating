@@ -14,3 +14,17 @@
 //= require jquery_ujs
 //= require turbolinks
 //= require_tree .
+$(document).ready(f => {
+  var app = new Vue({
+    el: '#home-element',
+    data: {
+      message: "hello"
+    },
+    components: {
+      stars: {
+        props: ['score'],
+        template: `<h3>{{score}}</h3>`
+      }
+    }
+  })
+})

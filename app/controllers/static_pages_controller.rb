@@ -3,7 +3,7 @@ class StaticPagesController < ApplicationController
 
   def home
     @new_photo = Photo.new()
-    @photo = current_user.photos.last
+    @photos = Photo.all.limit(6)
   end
 
   def user_generate
