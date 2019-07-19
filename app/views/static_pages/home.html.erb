@@ -51,15 +51,35 @@
                 </div>
                 <p class="post-actions">
                   <star-rating v-bind:increment="0.1" v-bind:max-rating="5"
-                    inactive-color="#000" active-color="yellow" v-bind:star-size="20"
-                    v-bind:rating="photo.photo_score"
-                     @rating-selected="setRating($event, index)">
+                               inactive-color="#000" active-color="yellow" v-bind:star-size="20"
+                               v-bind:rating="photo.photo_score"
+                               @rating-selected="setRating($event, index)">
                   </star-rating>
                   <i v-if="photo.loading" class="fas fa-circle-notch fa-spin"></i>
-                  <a href="#">Vote</a>
-                  <a href="#">Comment</a>
                 </p>
+
+                <div class="comments">
+                  <div v-for="comment in photo.comments">
+                    <div class="comment">
+                      <a href="#" class="comment-avatar pull-left"><img src="img/user.png" alt=""></a>
+                      <div class="comment-text">
+                        <p>{{comment.content}}</p>
+                      </div>
+                    </div>
+                    <div class="clearfix"></div>
+                  </div>
                 </div>
+
+                <div class="clearfix"></div>
+
+                <form>
+                  <div class="input-group">
+                    <input type="text" class="form-control" name="email" placeholder="Your comments" v-model="photo.comment_content">
+                    <span class="input-group-addon" v-on:click="comment(index)"><i class="glyphicon glyphicon-user"></i></span>
+                  </div>
+                </form>
+
+              </div>
             </div>
           </div>
         </div>

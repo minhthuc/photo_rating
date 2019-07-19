@@ -23,7 +23,7 @@ class PhotosController < ApplicationController
     photos = Photo.all.limit(7)
     user_hash = Hash.new
     photos.each do |photo|
-      comments = photo.comments.limit(3)
+      comments = photo.comments.limit(3).reverse
       unless user_hash["#{photo.user.id}"]
         tmp = photo.user.email
         user_hash["#{photo.user.id}"] = tmp

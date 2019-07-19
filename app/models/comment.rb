@@ -4,5 +4,7 @@ class Comment < ActiveRecord::Base
   belongs_to :user
   belongs_to :photo
 
-  validates :content, length: {maximum: MAX_LENGTH_CONTENT}
+  default_scope -> { order('created_at DESC') }
+
+  validates :content, length: { maximum: MAX_LENGTH_CONTENT }
 end

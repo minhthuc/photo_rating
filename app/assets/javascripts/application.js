@@ -36,8 +36,21 @@ $(document).ready(f => {
           console.log(er)
         })
       },
-      comment: function (value, index) {
-
+      comment: function (index) {
+        let self = this;
+        let photo_id = self.photos[index].id;
+        let content = self.photos[index].comment_content;
+        self.photos[index].comment_content = "";
+        console.log("u just have comment", content);
+        $.post("/comments", {comment:{photo_id, content}}).done(function (response) {
+          if (response.code == 1){
+            self.photos[index].comments.push({content: content})
+          }else {
+            alert(response.message)
+          }
+        }).error(err=>{
+          console.log(err)
+        })
       }
     },
     computed:{
@@ -46,9 +59,9 @@ $(document).ready(f => {
         $.get("/photos").done(respose=>{
           self.photos = respose.map(f=>{
             f.loading = false;
+            f.comment_content = "";
             return f
           })
-          return
         }).error(er=>{
 
         })

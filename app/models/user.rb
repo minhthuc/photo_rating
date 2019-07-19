@@ -10,8 +10,9 @@ class User < ActiveRecord::Base
   def vote photo, score
     vote = rates.find_or_initialize_by photo_id: photo.id
     vote.score = score
-    vote.save
-    photo.is_update_score = false
+    if vote.save
+      photo.is_update_score = false
+    end
     photo.get_score
   end
 end

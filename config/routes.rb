@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   match "/vote", to: 'rates#create', via: "post"
 
-  get 'comments/create'
+  match "/comments", to: "comments#create", via: "post"
 
   match 'photos/create', to:'photos#create', via: "post"
   match 'photos', to:'photos#get_photos', via: "get"
