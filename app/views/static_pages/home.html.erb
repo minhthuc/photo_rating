@@ -26,7 +26,6 @@
             <% end %>
           </div>
         </div>
-        {{photos_get}}
         <div v-for="(photo, index) in photos" class="panel panel-default post" id="home-element">
           <div class="panel-body">
             <div class="row">
@@ -61,7 +60,7 @@
                 <div class="comments">
                   <div v-for="comment in photo.comments">
                     <div class="comment">
-                      <a href="#" class="comment-avatar pull-left"><img src="img/user.png" alt=""></a>
+                      <a href="#" class="comment-avatar pull-left"><%= image_tag("user.png") %></a>
                       <div class="comment-text">
                         <p>{{comment.content}}</p>
                       </div>
@@ -75,20 +74,13 @@
                 <form>
                   <div class="input-group">
                     <input type="text" class="form-control" name="email" placeholder="Your comments" v-model="photo.comment_content">
-                    <span class="input-group-addon" v-on:click="comment(index)"><i class="glyphicon glyphicon-user"></i></span>
+                    <span class="input-group-addon" v-on:click="comment(index)"><i class="fas fa-paper-plane"></i></span>
                   </div>
                 </form>
-
               </div>
             </div>
           </div>
         </div>
-
-        <%# @photos.each do |photo| %>
-        <%#= render partial: "photos/photo", locals:{photo: photo} %>
-        <%# end %>
-        <%#= render @photos %>
-
       </div>
       <div class="col-md-4">
         <div class="panel panel-default friends">
@@ -133,6 +125,69 @@
     </div>
   </div>
 </section>
-<script>
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(f => {
+    let home = new Vue({
+      el: '#home_element',
+      data: {
+        rating: 3,
+        photos: []
+      },
+      methods: {
+        setRating: function (rating, index) {
+          let self = this;
+          let photo_id = self.photos[index].id;
+          rating = Math.ceil(rating)
+          self.photos[index].loading = true;
+          $.post("/vote", {photo_id, rating}).done(function (respone) {
+            self.photos[index].photo_score = parseInt(respone)
+            self.photos[index].loading = false;
+            console.log(respone)
+          }).error(er => {
+            console.log(er)
+          })
+        },
+        comment: function (index) {
+          let self = this;
+          let photo_id = self.photos[index].id;
+          let content = self.photos[index].comment_content;
+          self.photos[index].comment_content = "";
+          $.post("/comments", {
+            comment: {
+              photo_id,
+              content
+            }
+          }).done(function (response) {
+            if (response.code == 1) {
+              self.photos[index].comments.push({content: content})
+            } else {
+              alert(response.message)
+            }
+          }).error(err => {
+            console.log(err)
+          })
+        },
+        photos_get: function (query, pages, limit) {
+          let self = this;
+          if (!pages) pages = 0;
+          if (!limit) limit = 6;
+          if (!query) query = null;
+          $.get("/photos", {photos: {pages, limit, query}}).done(respose => {
+            self.photos = respose.map(f => {
+              f.loading = false;
+              f.comment_content = "";
+              return f
+            })
+          }).error(er => {
 
+          })
+        }
+
+      },
+      computed: {},
+      mounted() {
+        this.photos = this.photos_get()
+      }
+    });
+  })
 </script>

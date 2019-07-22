@@ -1,12 +1,14 @@
 Rails.application.routes.draw do
-  match "/vote", to: 'rates#create', via: "post"
+  match "/vote", to: "rates#create", via: "post"
 
   match "/comments", to: "comments#create", via: "post"
 
-  match 'photos/create', to:'photos#create', via: "post"
-  match 'photos', to:'photos#get_photos', via: "get"
+  match "photos", to: "photos#get_photos", via: "get"
+  match "photos/create", to: "photos#create", via: "post"
+  match "photo", to: "photos#find_photo", via: "get"
+  match "photo/:id", to: "photos#show", via: "get"
 
-  root 'static_pages#home'
+  root "static_pages#home"
   match "/users/gets", to: "static_pages#user_generate", via: "get"
   devise_for :users
   devise_scope :user do
