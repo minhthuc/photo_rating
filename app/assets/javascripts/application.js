@@ -17,7 +17,6 @@
 
 $(document).ready(() => {
   Vue.component('star-rating', VueStarRating.default);
-
   new Vue({
     el: '#app',
     data: {

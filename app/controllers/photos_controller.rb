@@ -1,5 +1,7 @@
 class PhotosController < ApplicationController
   NO_COMENT = "nc"
+  
+  protect_from_forgery except: [:update]
 
   before_action :get_photo, only: [:show, :find_photo]
 
@@ -55,14 +57,32 @@ class PhotosController < ApplicationController
 
   def find_photo
     comments = @photo.comments.order(created_at: :desc)
-    # byebug
-    # comments = comments.attributes
+    categories = @photo.categories
     @photo = @photo.attributes
-    # comments.each do |comment|
-    #   comment[:owned] = current_user.id == comment.user_id
-    # end
     @photo[:comments] = comments
+    @photo[:categories] = categories
     render json: @photo
+  end
+
+  def user_photos
+    photos = Photo.where(user_id: params[:id])
+    render json: photos
+  end
+
+  def update
+    _params = params[:photo]
+    photo = Photo.find(_params[:id])
+    cat = []
+    _params[:categories].each do |c|
+      _cat = Category.find(c)
+      cat.push(_cat)
+    end
+    photo.categories = cat
+    if photo.save
+      render json: { code: 1, message: "ok" }
+    else
+      render json: { code: 0, message: "fail" }
+    end
   end
 
   private

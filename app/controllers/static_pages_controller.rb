@@ -1,20 +1,12 @@
 class StaticPagesController < ApplicationController
-  before_action :sign_in?
+  before_action :sign_in?, only: [:home, :show]
 
   def home
     @new_photo = Photo.new()
-    # @photos = []
-    # @photos = Photo.all.limit(7)
-    # user_hash = Hash.new
-    # photos.each do |photo|
-    #   unless user_hash["#{photo.user.id}"]
-    #     tmp = photo.user.email
-    #     user_hash["#{photo.user.id}"] = tmp
-    #   end
-    #   tmp_photo_hash = photo.attributes
-    #   tmp_photo_hash["user_email"]= user_hash["#{photo.user.id}"]
-    #   @photos.push tmp_photo_hash
-    # end
+  end
+
+  def show
+    @user = current_user
   end
 
   def user_generate
@@ -22,8 +14,18 @@ class StaticPagesController < ApplicationController
     render json: @users
   end
 
+  def get_current_user
+    if user_signed_in?
+      render json: current_user
+    else
+      render json: { code: 0, message: "User is not signed" }
+    end
+  end
+
   private
+
   def sign_in?
     redirect_to sign_in_path unless user_signed_in?
   end
+
 end

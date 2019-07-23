@@ -12,8 +12,8 @@
       <div class="col-lg-5">
         <ul class="nav navbar-nav">
           <li class="active"><%= link_to("Home", root_url) %></li>
-          <li><a href="/photo/76">Photos</a></li>
-          <li><a href="photos.html">Category</a></li>
+          <li><%= link_to("Photo", profile_path) %></li>
+          <li><%= link_to("Category", categoies_index_path) %></li>
         </ul>
       </div>
       <div class="col-lg-7" id="app">
