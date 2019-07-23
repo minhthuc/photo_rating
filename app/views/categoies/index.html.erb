@@ -1,0 +1,208 @@
+<% provide(:title, "Category") %>
+<section>
+  <div class="container" id="category">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              Create Category
+            </h3>
+          </div>
+          <div class="panel-body">
+            <div class="clearfix"></div>
+            <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="50px" class="demo-ruleForm">
+              <el-form-item label="Code" prop="code">
+                <el-input type="text" v-model="ruleForm.code" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="Name" prop="name">
+                <el-input type="text" v-model="ruleForm.name" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click="submitForm('ruleForm')">Submit</el-button>
+                <el-button @click="resetForm('ruleForm')">Reset</el-button>
+              </el-form-item>
+            </el-form>
+
+          </div>
+          <div v-for="(photo, index) in photos" class="panel panel-default post">
+            <div class="panel-body">
+              <div class="row">
+                <div class="col-sm-2">
+                  <a href="profile.html"
+                     class="post-avatar thumbnail">
+                    <div class="text-center">{{photo.user_email}}</div>
+                  </a>
+                </div>
+                <div class="col-sm-10">
+                  <div class="pointer text-center">
+                    <img v-bind:src="photo.location" v-bind:alt="photo.title">
+                  </div>
+                  <div class="pointer-border">
+                    <h4 class="text-center">
+                      {{photo.title}}
+                    </h4>
+                    <p>
+                      {{photo.description}}
+                    </p>
+                  </div>
+                  <p class="post-actions">
+                    <star-rating v-bind:increment="0.1" v-bind:max-rating="5"
+                                 inactive-color="#000" active-color="yellow" v-bind:star-size="20"
+                                 v-bind:rating="photo.photo_score"
+                                 @rating-selected="setRating($event, index)">
+                    </star-rating>
+                    <i v-if="photo.loading" class="fas fa-circle-notch fa-spin"></i>
+                  </p>
+
+                  <div class="comments">
+                    <div v-for="comment in photo.comments">
+                      <div class="comment">
+                        <div class="comment-text">
+                          <p>{{comment.content}}</p>
+                        </div>
+                      </div>
+                      <div class="clearfix"></div>
+                    </div>
+                  </div>
+
+                  <div class="clearfix"></div>
+
+                  <form>
+                    <div class="input-group">
+                      <input type="text" class="form-control" name="email" placeholder="Your comments" v-model="photo.comment_content">
+                      <span class="input-group-addon" v-on:click="comment(index)"><i class="fas fa-paper-plane"></i></span>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              Categories
+            </h3>
+          </div>
+          <div class="panel-body">
+            <div class="list-group">
+              <button v-for="category in categories"
+                      class="list-group-item list-group-item-action"
+                      v-on:click="images_get(category.id)">
+                {{category.name}}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  $(document).ready(() => {
+    new Vue({
+      el: "#category",
+      data() {
+        var check_code = (rule, value, callback) => {
+          value = value + '';
+          if (!value) {
+            return callback(new Error('Please input the code'));
+          }
+          if (value.length > 10) {
+            return callback(new Error("Please Code can not be longer than 10"))
+          }
+          callback()
+        };
+        var check_name = (rule, value, callback) => {
+          value = value + '';
+          if (value === '') {
+            return callback(new Error('Please input the name'));
+          }
+          if (this.ruleForm.name === '') {
+            return callback(new Error("Please Enter category name"))
+          }
+          if (value.length > 50) {
+            callback(new Error('Name can not be longer than 50'));
+          }
+          callback();
+        };
+        return {
+          ruleForm: {
+            code: '',
+            name: '',
+          },
+          rules: {
+            code: [
+              {validator: check_code, trigger: 'blur'}
+            ],
+            name: [
+              {validator: check_name, trigger: 'blur'}
+            ],
+          },
+          categories: [],
+          photos: []
+        };
+      },
+      methods: {
+        submitForm(formName) {
+          this.$refs[formName].validate((valid) => {
+            if (valid) {
+              $.post("/category", {
+                category: {
+                  code: this.ruleForm.code,
+                  name: this.ruleForm.name
+                }
+              }).done(response => {
+                if (response.code == 1) {
+                  this.categories.push({
+                    code: this.ruleForm.code,
+                    name: this.ruleForm.name
+                  })
+                } else {
+                  return this.$notify({
+                    title: "error",
+                    message: "Can not create category!"
+                  })
+                }
+              })
+            } else {
+              console.log('error submit!!');
+              return false;
+            }
+          });
+        },
+        resetForm(formName) {
+          this.$refs[formName].resetFields();
+        },
+        get_categories() {
+          return new Promise((resolve, reject) => {
+            $.get("/categories/get").done(response => {
+              return resolve(response)
+            }).error(err => {
+              return reject(err)
+            })
+          })
+        },
+        images_get(id) {
+          let self = this;
+          return new Promise((resolve, reject) => {
+            $.get("/categories/get_images", {id}).done(response => {
+              self.photos = response;
+              console.log(self.photos)
+              return resolve(response)
+            }).error(err => {
+              return reject(err)
+            })
+          })
+        }
+      },
+      async mounted() {
+        this.categories = await this.get_categories()
+      }
+    })
+  })
+</script>

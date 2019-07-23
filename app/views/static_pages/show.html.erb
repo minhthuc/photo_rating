@@ -1,0 +1,172 @@
+<% provide(:title, "My page") %>
+<link rel="stylesheet" type="text/css" href="https://unpkg.com/vue-simple-context-menu/dist/vue-simple-context-menu.css">
+
+<section id="mypage">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12" v-if="edit">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              Edit Image
+            </h3>
+          </div>
+          <div class="panel-body">
+            <div class="clearfix"></div>
+            <div class="col-md-4">
+              <img v-bind:src="photo_choose.location" class="img-responsive">
+            </div>
+            <div class="col-md-8">
+
+              <div class="row">
+                <el-input v-model="photo_choose.title" clearable>
+                  <template slot="prepend" class="btn btn-info">Title</template>
+                </el-input>
+              </div>
+              <div class="row">
+                <el-input v-model="photo_choose.description" clearable>
+                  <template slot="prepend" class="btn btn-info">Description</template>
+                </el-input>
+              </div>
+              <div class="row">
+                <el-select
+                  v-model="photo_choose.categories"
+                  multiple
+                  filterable
+                  placeholder="Please enter a keyword">
+                  <el-option
+                    v-for="item in categories"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id">
+                  </el-option>
+                </el-select>
+              </div>
+              <div class="row">
+                <el-button type="success" v-on:click="close" class="right">Close</el-button>
+                <el-button type="success" v-on:click="update(index)" class="right">Update</el-button>
+              </div>
+            </div>
+
+          </div>
+          <div v-for="(photo, index) in photos" class="panel panel-default post">
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="row">
+      <div class="gallery col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <h1 class="gallery-title"><%= "Gallery of #{@user.email}" %></h1>
+      </div>
+      <div class="gallery_product col-lg-4 col-md-4 col-sm-4 col-xs-6 filter hdpe"
+           v-for="(photo, index) in photos">
+        <a v-bind:href="photo.path">
+          <img v-bind:src="photo.location" class="img-responsive">
+        </a>
+
+        <i class="fa fa-pencil edit_button_on_image" v-on:click="edit_form(photo, index)"></i>
+      </div>
+
+    </div>
+  </div>
+</section>
+<script>
+  $(document).ready(() => {
+    var app = new Vue({
+      el: "#mypage",
+      data: {
+        photos: [],
+        user: {},
+        index_edit: false,
+        photo_choose: {},
+        edit: false,
+        categories: []
+      },
+      methods: {
+        get_current_user() {
+          let self = this;
+          return new Promise((resolve, reject) => {
+            $.get("/current_user").done(response => {
+              if (response.code && response.code == 0) {
+                window.location.replace("/");
+                return reject(response.message)
+              } else {
+                self.user = response;
+                return resolve(response)
+              }
+            })
+          })
+        },
+        get_photos_user() {
+          let self = this;
+          return new Promise((resolve, reject) => {
+            $.get("/user/photos", {id: self.user.id}).done(response => {
+              self.photos = response.map(f => {
+                f.path = `/photo/${f.id}`;
+                return f;
+              });
+              return resolve(response)
+            }).error(err => {
+              return resolve([])
+            })
+          })
+        },
+        edit_form(photo, index) {
+          this.edit = true;
+          let self = this;
+          return new Promise((resolve, reject) => {
+            $.get("/photo", {id: photo.id}).done(response => {
+              self.photo_choose = response;
+              return resolve()
+            }).error(err => {
+              return reject(err);
+            })
+          })
+        },
+        get_categories() {
+          let self = this;
+          return new Promise((resolve, reject) => {
+            $.get("/categories/get").done(response => {
+              console.log(response)
+              // response = response.map(c=>{
+              //   c.value = c.id;
+              //   c.label = c.name;
+              // })
+              self.categories = response
+              return resolve(response)
+            }).error(er => {
+              return resolve([])
+            })
+          })
+        },
+        update() {
+          let self = this;
+          let photo = self.photo_choose;
+          $.post("/photo/update", {photo}).done(response => {
+            if (response.code === 1) {
+              return this.$notify({
+                text: "success",
+                message: "update succesfully"
+              })
+            } else {
+              return this.$notify({
+                text: "error",
+                message: "update unsuccesfully"
+              })
+            }
+          })
+        },
+        close() {
+          this.edit = false
+        }
+      },
+      async mounted() {
+        this.user = await this.get_current_user();
+        this.photos = await this.get_photos_user();
+        this.categories = await this.get_categories();
+      }
+    })
+  })
+</script>

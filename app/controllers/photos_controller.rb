@@ -1,6 +1,8 @@
 class PhotosController < ApplicationController
   NO_COMENT = "nc"
 
+  protect_from_forgery except: [:update]
+
   before_action :get_photo, only: [:show, :find_photo]
 
   def show
@@ -14,14 +16,22 @@ class PhotosController < ApplicationController
     file = photo_params[:location]
     dir = "#{Rails.root}/public/images/users/#{current_user.id}/"
     Dir.mkdir(dir) unless Dir.exist?(dir)
-    File.open("#{dir}/#{file.original_filename}", 'wb') do |f|
-      f.write(file.read)
+
+    if file.nil?
+      flash[:error] = "You need to upload an image!"
+    else
+      File.open("#{dir}/#{file.original_filename}", 'wb') do |f|
+        f.write(file.read)
+      end
+      location = "/images/users/#{current_user.id}/#{file.original_filename}"
+      photo = current_user.photos.new(photo_params)
+      photo.location = "#{location}"
+      if photo.save
+        flash[:success] = "Your Photo upload completed"
+      else
+        flash[:error] = "Can not push your post!"
+      end
     end
-    location = "/images/users/#{current_user.id}/#{file.original_filename}"
-    photo = current_user.photos.new(photo_params)
-    photo.location = "#{location}"
-    photo.save
-    flash[:success] = "Your Photo upload completed"
     redirect_to root_path
   end
 
@@ -55,14 +65,32 @@ class PhotosController < ApplicationController
 
   def find_photo
     comments = @photo.comments.order(created_at: :desc)
-    # byebug
-    # comments = comments.attributes
+    categories = @photo.categories
     @photo = @photo.attributes
-    # comments.each do |comment|
-    #   comment[:owned] = current_user.id == comment.user_id
-    # end
     @photo[:comments] = comments
+    @photo[:categories] = categories
     render json: @photo
+  end
+
+  def user_photos
+    photos = Photo.where(user_id: params[:id])
+    render json: photos
+  end
+
+  def update
+    _params = params[:photo]
+    photo = Photo.find(_params[:id])
+    cat = []
+    _params[:categories].each do |c|
+      _cat = Category.find(c)
+      cat.push(_cat)
+    end
+    photo.categories = cat
+    if photo.save
+      render json: { code: 1, message: "ok" }
+    else
+      render json: { code: 0, message: "fail" }
+    end
   end
 
   private

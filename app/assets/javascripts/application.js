@@ -14,10 +14,10 @@
 //= require jquery_ujs
 //= require turbolinks
 //= require index
+//= require star-rating.min
 
 $(document).ready(() => {
   Vue.component('star-rating', VueStarRating.default);
-
   new Vue({
     el: '#app',
     data: {
