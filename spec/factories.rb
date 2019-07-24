@@ -14,4 +14,8 @@ FactoryGirl.define do
     code "NT"
     name "Nghệ thuật"
   end
+
+  factory :comment do
+    content "just a comment"
+  end
 end

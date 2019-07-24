@@ -51,12 +51,13 @@ class PhotosController < ApplicationController
     photos.each do |photo|
       comments = photo.comments.limit(3).reverse unless photo_query[:options] || photo_query[:options] == NO_COMENT
       unless user_hash["#{photo.user.id}"]
-        tmp = photo.user.email
+        tmp = photo.user
         user_hash["#{photo.user.id}"] = tmp
       end
       tmp_photo_hash = { title: photo[:title], location: photo[:location],
                          description: photo[:description], score: photo[:photo_score], id: photo.id }
-      tmp_photo_hash["user_email"] = user_hash["#{photo.user.id}"]
+      tmp_photo_hash["user_email"] = user_hash["#{photo.user.id}"].email
+      tmp_photo_hash["user_id"] = user_hash["#{photo.user.id}"][:id]
       tmp_photo_hash["comments"] = comments unless photo_query[:options] || photo_query[:options] == NO_COMENT
       @photos.push tmp_photo_hash
     end

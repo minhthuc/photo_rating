@@ -1,12 +1,17 @@
-require 'rails_helper'
+require 'spec_helper'
 
-RSpec.describe CategoiesController, type: :controller do
+RSpec.feature do
+  describe "Categories" do
+    subject { page }
+    context "Category page" do
+      before { visit "/categoies/index" }
+      it { is_expected.to have_title "Category" }
+      it { is_expected.to have_content "Categories" }
+      context "with out sign in" do
+        get current_user_path
+        current_user.code.should == 0
+      end
 
-  describe "GET #index" do
-    it "returns http success" do
-      get :index
-      expect(response).to have_http_status(:success)
     end
   end
-
 end

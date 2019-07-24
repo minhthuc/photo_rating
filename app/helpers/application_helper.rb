@@ -34,4 +34,7 @@ module ApplicationHelper
     return string.html_safe
   end
 
+  def user_signed?
+    user_signed_in?
+  end
 end

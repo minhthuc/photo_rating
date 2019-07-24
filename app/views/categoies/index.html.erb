@@ -4,13 +4,13 @@
     <div class="row">
       <div class="col-md-8">
         <div class="panel panel-default">
-          <div class="panel-heading">
+          <div class="panel-heading"  v-if="is_create">
             <h3 class="panel-title">
               Create Category
             </h3>
           </div>
           <div class="panel-body">
-            <div class="clearfix"></div>
+            <div class="clearfix" v-if="is_create"></div>
             <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="50px" class="demo-ruleForm">
               <el-form-item label="Code" prop="code">
                 <el-input type="text" v-model="ruleForm.code" autocomplete="off"></el-input>
@@ -144,7 +144,8 @@
             ],
           },
           categories: [],
-          photos: []
+          photos: [],
+          is_create: false
         };
       },
       methods: {
@@ -175,6 +176,21 @@
             }
           });
         },
+        user_signed_in() {
+          let self = this;
+          return new Promise((resolve, reject) => {
+            $.get("/current_user").done(response => {
+              if (response.code) {
+                self.is_create = true;
+                return resolve(true)
+              } else {
+                return resolve(false)
+              }
+            }).error(er => {
+              return resolve(false);
+            })
+          })
+        },
         resetForm(formName) {
           this.$refs[formName].resetFields();
         },
@@ -198,10 +214,23 @@
               return reject(err)
             })
           })
-        }
+        },
+        setRating: function (rating, index) {
+          let self = this;
+          let photo_id = self.photos[index].id;
+          rating = Math.ceil(rating)
+          self.photos[index].loading = true;
+          $.post("/vote", {photo_id, rating}).done(function (respone) {
+            self.photos[index].photo_score = parseInt(respone)
+            self.photos[index].loading = false;
+          }).error(er => {
+            console.log(er)
+          })
+        },
       },
       async mounted() {
-        this.categories = await this.get_categories()
+        this.categories = await this.get_categories();
+        this.is_create = await this.user_signed_in();
       }
     })
   })

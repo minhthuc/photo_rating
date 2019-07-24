@@ -7,6 +7,8 @@ Rails.application.routes.draw do
   match "/vote", to: "rates#create", via: "post"
 
   match "/comments", to: "comments#create", via: "post"
+  match "/comment/update", to: "comments#update", via: "post"
+  match "/comment/delete", to: "comments#delete", via: "post"
 
   match "photos", to: "photos#get_photos", via: "get"
   match "photos/create", to: "photos#create", via: "post"
@@ -21,8 +23,8 @@ Rails.application.routes.draw do
   match "/users/gets", to: "static_pages#user_generate", via: "get"
   devise_for :users
   devise_scope :user do
-    # root "devise/sessions#new"
     match "/sign-in", to: "devise/sessions#new", via: "get"
     match "/sign-up", to: "devise/registrations#new", via: "get"
   end
+
 end

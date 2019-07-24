@@ -1,8 +1,14 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= yield(:title) + "aaaa" %></title>
+    <title><%= yield(:title) %></title>
     <%= stylesheet_link_tag 'application', media: 'all' %>
+    <%= javascript_include_tag 'application' %>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-star-rating@1.6.1/dist/star-rating.min.js"></script>
+    <script src="https://kit.fontawesome.com/860404087b.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="/js/vue-context-menu.min.js" type="application/javascript"></script>
   </head>
   <body>
     <%= render "layouts/nav" %>
@@ -15,8 +21,4 @@
       </div>
     </div>
   </body>
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
-  <%= javascript_include_tag 'application' %>
-  <script src="https://kit.fontawesome.com/860404087b.js"></script>
-  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
 </html>

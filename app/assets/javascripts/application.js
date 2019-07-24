@@ -12,11 +12,11 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require_tree .
-
+//= require index
+//= require_self
 $(document).ready(() => {
-  console.log('aaaa');
   Vue.component('star-rating', VueStarRating.default);
+  // import VueContext from "vue-context-menu.min"
   new Vue({
     el: '#app',
     data: {

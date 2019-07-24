@@ -12,6 +12,8 @@ class CategoiesController < ApplicationController
       else
         render json: { code: 0, message: "fail" }
       end
+    else
+      render json: { code: 0, message: "fail" }
     end
   end
 
@@ -21,8 +23,16 @@ class CategoiesController < ApplicationController
   end
 
   def get_image_by_category
-    current_category = Category.find_by(params[:id])
-    photos = current_category.photos
+    current_category = Category.find_by(id: params[:id])
+    photos = []
+    _photos = current_category.photos
+    _photos.each do |photo|
+      hash = Hash.new
+      email = photo.user.email
+      hash[photo.id] = photo.attributes
+      hash[photo.id][:user_email] = email
+      photos.push(hash[photo.id])
+    end
     render json: photos
   end
 
@@ -31,5 +41,4 @@ class CategoiesController < ApplicationController
   def category_param
     params.require(:category).permit(:code, :name)
   end
-
 end
