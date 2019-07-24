@@ -1,13 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= yield(:title) %></title>
-    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track' => true %>
-    <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
-    <script src="https://kit.fontawesome.com/860404087b.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
-    <script src="https://unpkg.com/vue-star-rating/dist/star-rating.min.js"></script>
-    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <title><%= yield(:title) + "aaaa" %></title>
+    <%= stylesheet_link_tag 'application', media: 'all' %>
   </head>
   <body>
     <%= render "layouts/nav" %>
@@ -20,4 +15,8 @@
       </div>
     </div>
   </body>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+  <%= javascript_include_tag 'application' %>
+  <script src="https://kit.fontawesome.com/860404087b.js"></script>
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
 </html>
