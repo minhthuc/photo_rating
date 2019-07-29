@@ -1,14 +1,24 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>PhotoProjectPreview</title>
-  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
-  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
-  <%= csrf_meta_tags %>
-</head>
-<body>
-
-<%= yield %>
-
-</body>
+  <head>
+    <title><%= yield(:title) %></title>
+    <%= stylesheet_link_tag 'application', media: 'all' %>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-star-rating@1.6.1/dist/star-rating.min.js"></script>
+    <script src="https://kit.fontawesome.com/860404087b.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="/js/vue-context-menu.min.js" type="application/javascript"></script>
+    <%= javascript_include_tag 'application' %>
+  </head>
+  <body>
+    <%= render "layouts/nav" %>
+    <% flash.each do |key, value| %>
+    <div class="alert alert-<%= key %>"><%= value %></div>
+  <% end %>
+    <div class="container">
+      <div class="row">
+        <%= yield %>
+      </div>
+    </div>
+  </body>
 </html>

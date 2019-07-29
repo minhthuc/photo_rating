@@ -1,0 +1,383 @@
+<section>
+  <div class="container" id="home_element">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Wall</h3>
+          </div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label> Title</label>
+              <input class="form-control" v-model="new_object.title">
+            </div>
+            <div class="form-group">
+              <label> Description</label>
+              <input class="form-control" v-model="new_object.description">
+            </div>
+            <div class="form-group">
+              <el-select
+                v-model="new_object.categories" name
+                multiple
+                filterable
+                placeholder="Categories">
+                <el-option
+                  v-for="item in categories"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+            <button style="margin-left: 10px;" type="button" class="btn btn-default"
+                    v-on:click="submit">upload
+            </button>
+
+            <div class="pull-right">
+              <input type="file" class="form-control" v-on:change="onfileChange">
+            </div>
+          </div>
+        </div>
+        <vue-context ref="menu_img">
+          <ul class="list-group">
+            <li class="list-group-item" v-on:click="edit" v-if="write_permission">Edit</li>
+            <li class="list-group-item" v-if="read_permission" v-on:click="show">Show</li>
+            <li class="list-group-item" v-if="write_permission" v-on:click="delete_object">Delete</li>
+            <li class="list-group-item">Cancel</li>
+          </ul>
+        </vue-context>
+        <div v-for="(photo, index) in photos" class="panel panel-default post" id="home-element">
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-sm-2">
+                <a href="profile.html"
+                   class="post-avatar thumbnail">
+                  <%= image_tag("user.png") %>
+                  <div class="text-center email_show">{{photo.user_email}}</div>
+                </a>
+                <div class="text-center email_show">{{photo.created}}</div>
+
+              </div>
+              <div class="col-sm-10 col-md-8 col-8">
+                <div class="pointer text-center">
+                  <img v-bind:src="photo.location" v-bind:alt="photo.title"
+                       @contextmenu.prevent="context(index, TYPE.PHOTO)" class="img-responsive">
+                </div>
+                <div class="pointer-border">
+                  <h4 class="text-center">
+                    {{photo.title}}
+                  </h4>
+                  <p>
+                    {{photo.description}}
+                  </p>
+                </div>
+                <p class="post-actions">
+                  <star-rating v-bind:increment="0.1" v-bind:max-rating="5"
+                               inactive-color="#000" active-color="yellow" v-bind:star-size="20"
+                               v-bind:rating="photo.score"
+                               @rating-selected="setRating($event, index)">
+                  </star-rating>
+                  <i v-if="photo.loading" class="fas fa-circle-notch fa-spin"></i>
+                </p>
+
+                <div class="comments">
+                  <div v-for="(comment,index_c) in photo.comments">
+                    <div class="comment" @contextmenu.prevent="context(index, TYPE.COMMENT, comment, index_c)">
+                      <a href="#" class="comment-avatar pull-left"><%= image_tag("user.png") %></a>
+                      <div class="comment-text">
+                        <p>{{comment.content}}</p>
+                        <p>{{comment.created_at}}</p>
+                      </div>
+                    </div>
+                    <div class="clearfix"></div>
+                  </div>
+                </div>
+
+                <div class="clearfix"></div>
+
+                <!--                <form>-->
+                <div class="input-group">
+                  <input type="text" class="form-control" placeholder="Your comments"
+                         v-model="photo.comment_content" v-on:keyup.enter="comment(index)">
+                  <span class="input-group-addon" v-on:click="comment(index)"><i class="fas fa-paper-plane"></i></span>
+                </div>
+                <!--                </form>-->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(f => {
+    Vue.component('vue-context', VueContextMenu);
+    let home = new Vue({
+      el: '#home_element',
+      data: {
+        index_comment: 0,
+        categories: [],
+        photos: [],
+        object: {},
+        index: 0,
+        type: "",
+        TYPE: {
+          COMMENT: "Comment",
+          PHOTO: "Photo",
+        },
+        current_user: {},
+        write_permission: false,
+        read_permission: false,
+        is_edit: false,
+        new_object: {
+          title: '',
+          description: '',
+          file: {
+            name: '',
+            data: ''
+          },
+          categories: []
+        },
+        formdata: new FormData()
+      },
+      methods: {
+        submit() {
+          let self = this;
+          self.formdata.append("title", self.new_object.title);
+          self.formdata.append("description", self.new_object.description);
+          self.formdata.append("categories", self.new_object.categories);
+          $.ajax({
+            type: "POST",
+            contentType: false,
+            url: "/photos/create",
+            data: self.formdata,
+            success: function (response) {
+              if (response.code == 1) {
+                let photo = response.photo;
+                photo.created = "now";
+                photo.user_email = self.current_user.email;
+                self.photos.unshift(photo);
+                self.new_object= {
+                  title: '',
+                    description: '',
+                    file: {
+                    name: '',
+                      data: ''
+                  },
+                  categories: []
+                }
+                return self.$notify({
+                  title: "success",
+                  message: response.message
+                })
+              } else {
+                return self.$notify({
+                  title: "fail",
+                  message: response.message
+                })
+              }
+            },
+            processData: false
+          });
+        },
+        onfileChange(file) {
+          let self = this;
+          file = file.target.files[0];
+          let data = new FormData();
+          data.append("location", file);
+          self.formdata = data;
+        },
+        get_current_user() {
+          let self = this;
+          return new Promise((resolve, reject) => {
+            $.get("/current_user").done(response => {
+              self.current_user = response;
+              return resolve(response);
+            }).error(er => {
+              return resolve({})
+            })
+          })
+        },
+        setRating: function (rating, index) {
+          let self = this;
+          let photo_id = self.photos[index].id;
+          self.photos[index].loading = true;
+          $.post("/vote", {photo_id, rating}).done(function (respone) {
+            self.photos[index].score = parseFloat(respone)
+            self.photos[index].loading = false;
+          }).error(er => {
+            console.log(er)
+          })
+        },
+        get_categories() {
+          let self = this;
+          return new Promise((resolve, reject) => {
+            $.get("/categories/get").done(response => {
+              self.categories = response
+              return resolve(response)
+            }).error(er => {
+              return resolve([])
+            })
+          })
+        },
+        comment: function (index_photo) {
+          let self = this;
+          if (!self.is_edit) {
+            let photo_id = self.photos[index_photo].id;
+            let content = self.photos[index_photo].comment_content;
+            if (content.trim().length == 0) return;
+            self.photos[index_photo].comment_content = "";
+            $.post("/comments", {
+              comment: {
+                photo_id,
+                content
+              }
+            }).done(function (response) {
+              if (response.code == 1) {
+                self.photos[index_photo].comments.push({
+                  content: content,
+                  user_id: self.current_user.id, id: response.id
+                })
+                console.log(self.photos[index_photo].comments)
+              } else {
+                alert(response.message)
+              }
+            }).error(err => {
+              console.log(err)
+            })
+          } else {
+            self.is_edit = false;
+            let content = self.photos[index_photo].comment_content;
+            self.photos[index_photo].comment_content = "";
+            $.post("/comment/update", {
+              comment: {
+                id: self.object.id,
+                content
+              }
+            }).done(response => {
+              if (response.code == 1) {
+                self.photos[index_photo].comments[self.index_comment].content = content;
+                self.$notify({
+                  title: "Success!",
+                  message: "Comment updated"
+                })
+              } else {
+                self.$notify({
+                  title: "Error!",
+                  message: response.message
+                })
+              }
+            }).error(err => {
+            })
+          }
+        },
+        photos_get: function (query, pages, limit) {
+          let self = this;
+          if (!pages) pages = 0;
+          if (!limit) limit = 6;
+          if (!query) query = null;
+          $.get("/photos", {photos: {pages, limit, query}}).done(respose => {
+            self.photos = respose.map(f => {
+              f.loading = false;
+              f.comment_content = "";
+              f.comments = f.comments.map(c => {
+                c.created_at = self.time_in_word(c.created_at);
+                return c;
+              })
+              return f;
+            })
+          }).error(er => {
+
+          })
+        }
+        ,
+        context(index, type, object, index_comment) {
+          let self = this;
+          self.index = index;
+          self.type = type;
+          if (type === this.TYPE.COMMENT) {
+            self.object = object;
+            self.index_comment = index_comment;
+            if (self.current_user.id == self.object.user_id) {
+              self.write_permission = true;
+            } else {
+              self.write_permission = false;
+            }
+            self.read_permission = false;
+          } else if (type === this.TYPE.PHOTO) {
+            self.object = this.photos[index];
+            if (self.object.user_id === self.current_user.id) {
+              self.write_permission = true
+            } else {
+              self.write_permission = false
+            }
+            self.read_permission = true
+          }
+          this.$refs.menu_img.open()
+        }
+        ,
+        edit() {
+          if (this.type === this.TYPE.COMMENT) {
+            this.is_edit = true;
+            this.photos[this.index].comment_content = this.photos[this.index].comments[this.index_comment].content;
+          } else {
+
+          }
+        },
+        time_in_word(time) {
+          const SEC = 1;
+          const MIN = 60 * SEC;
+          const HOUR = 60 * MIN;
+          const DAY = 24 * HOUR;
+          const MONTH = 30 * DAY;
+          const YEAR = 365 * DAY;
+          let today = new Date().getTime() / 1000;
+          time = new Date(time).getTime() / 1000;
+          let duration = parseInt(today - time);
+          console.log(duration)
+          switch (true) {
+            case (duration <= SEC):
+              return "now";
+            case (duration > SEC && duration <= MIN):
+              return "a min ago";
+            case (duration > MIN && duration <= HOUR):
+              return `${parseInt(duration / MIN)} mins ago`;
+            case (duration > HOUR && duration <= DAY):
+              return `${parseInt(duration / HOUR)} hours ago`;
+            case (duration > DAY && duration <= MONTH):
+              return `${parseInt(duration / DAY)} days ago`;
+            case (duration > MONTH && duration <= YEAR):
+              return `${parseInt(duration / MONTH)} months ago`;
+            default:
+              return `${parseInt(duration / YEAR)} years ago`;
+          }
+        },
+        delete_object() {
+          let self = this;
+          if (this.type === this.TYPE.COMMENT) {
+            $.post("/comment/delete", {comment: {id: self.object.id}}).done(response => {
+              if (response.code == 1) {
+                self.photos[self.index].comments.splice(self.index_comment, 1);
+                self.$notify({
+                  title: "Success",
+                  message: response.message
+                })
+              }
+            }).error(er => {
+            })
+          } else {
+
+          }
+        }
+      },
+      computed: {},
+      async mounted() {
+        this.photos = this.photos_get();
+        this.current_user = await this.get_current_user();
+        this.categories = await this.get_categories()
+      }
+    });
+  })
+</script>

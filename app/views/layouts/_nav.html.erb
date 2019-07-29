@@ -1,0 +1,57 @@
+<% if user_signed? %>
+  <nav class="navbar navbar-default">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+      </div>
+      <div id="navbar" class="collapse navbar-collapse">
+        <div class="col-lg-5">
+          <ul class="nav navbar-nav">
+            <li class="active"><%= link_to("Home", root_url) %></li>
+            <li><%= link_to("Photo", profile_path) %></li>
+            <li><%= link_to("Category", categoies_index_path) %></li>
+            <li><%= link_to("Sign out", destroy_user_session_path) %></li>
+          </ul>
+        </div>
+        <div class="col-lg-7" id="app">
+          <el-col>
+            <el-autocomplete
+              popper-class="my-autocomplete"
+              class="inline-input"
+              v-model="state1"
+              :fetch-suggestions="querySearch"
+              placeholder="Search"
+              @select="handleSelect"
+            >
+              <template slot-scope="{ item }">
+                <div class="row">
+                  <div class="col-sm-4">
+                    <img v-bind:src="item.location" alt="" class="photo_insearch">
+                  </div>
+                  <div class="col-sm-4">
+                    <span class="link">{{item.title}}</span>
+                  </div>
+                  <div class="col-sm-4">
+                    <star-rating v-bind:increment="0.1" v-bind:max-rating="5"
+                                 inactive-color="#000" active-color="yellow" v-bind:star-size="20"
+                                 v-bind:rating="item.score"
+                                 @rating-selected="setRating($event, index)"
+                                 read-only>
+                    </star-rating>
+                  </div>
+                  <div class="clear-fix"></div>
+                </div>
+              </template>
+            </el-autocomplete>
+          </el-col>
+        </div>
+
+      </div><!--/.nav-collapse -->
+    </div>
+  </nav>
+<% end %>
