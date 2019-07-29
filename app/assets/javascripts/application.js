@@ -13,6 +13,7 @@
 //= require jquery
 //= require jquery_ujs
 //= require index
+//= require star-rating.min
 //= require_self
 $(document).ready(() => {
   Vue.component('star-rating', VueStarRating.default);

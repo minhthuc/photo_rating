@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190719084030) do
+ActiveRecord::Schema.define(version: 20190717073836) do
 
   create_table "categori_photos", force: :cascade do |t|
     t.integer  "photo_id"
@@ -36,11 +36,9 @@ ActiveRecord::Schema.define(version: 20190719084030) do
     t.string   "content"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer  "user_id"
     t.integer  "photo_id"
+    t.integer  "user_id"
   end
-
-  add_index "comments", ["photo_id", "user_id"], name: "index_comments_on_photo_id_and_user_id"
 
   create_table "photos", force: :cascade do |t|
     t.string   "title"
@@ -57,7 +55,7 @@ ActiveRecord::Schema.define(version: 20190719084030) do
   add_index "photos", ["title"], name: "index_photos_on_title"
 
   create_table "rates", force: :cascade do |t|
-    t.integer  "score"
+    t.float    "score"
     t.integer  "photo_id"
     t.integer  "user_id"
     t.datetime "created_at", null: false

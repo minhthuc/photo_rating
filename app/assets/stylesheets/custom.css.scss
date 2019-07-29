@@ -9,62 +9,78 @@ aside.col-sm-4 {
   width: 10px;
   height: 10px;
 }
+
 //@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
 
-fieldset, label { margin: 0; padding: 0; }
-body{ margin: 20px; }
-h1 { font-size: 1.5em; margin: 10px; }
+fieldset, label {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 20px;
+}
+
+h1 {
+  font-size: 1.5em;
+  margin: 10px;
+}
 
 /****** Style Star Rating Widget *****/
 
 .rating {
- color: yellow;
+  color: yellow;
   margin-left: 4px;
   margin-right: 4px;
 }
-.search-form{
+
+.search-form {
   margin-top: 10px;
   height: auto;
 }
+
 .photo_insearch {
   height: 30%;
   width: 30%;
 }
+
 .el-input__inner {
   margin-top: 5px;
   width: 550px !important;
   float: right;
 }
 
-.gallery-title
-{
+.gallery-title {
   font-size: 36px;
   color: #42B32F;
   text-align: center;
   font-weight: 500;
   margin-bottom: 70px;
 }
+
 .gallery-title:after {
   content: "";
   position: absolute;
-  width: 7.5%;.gallery-title
-{
+  width: 7.5%;
+
+  .gallery-title {
     font-size: 36px;
     color: #42B32F;
     text-align: center;
     font-weight: 500;
     margin-bottom: 70px;
-}
-.gallery-title:after {
+  }
+
+  .gallery-title:after {
     content: "";
     position: absolute;
     width: 7.5%;
     left: 46.5%;
     height: 45px;
     border-bottom: 1px solid #5e5e5e;
-}
-.filter-button
-{
+  }
+
+  .filter-button {
     font-size: 18px;
     border: 1px solid #42B32F;
     border-radius: 5px;
@@ -72,9 +88,9 @@ h1 { font-size: 1.5em; margin: 10px; }
     color: #42B32F;
     margin-bottom: 30px;
 
-}
-.filter-button:hover
-{
+  }
+
+  .filter-button:hover {
     font-size: 18px;
     border: 1px solid #42B32F;
     border-radius: 5px;
@@ -82,28 +98,27 @@ h1 { font-size: 1.5em; margin: 10px; }
     color: #ffffff;
     background-color: #42B32F;
 
-}
-.btn-default:active .filter-button:active
-{
+  }
+
+  .btn-default:active .filter-button:active {
     background-color: #42B32F;
     color: white;
-}
+  }
 
-.port-image
-{
+  .port-image {
     width: 100%;
-}
+  }
 
-.gallery_product
-{
+  .gallery_product {
     margin-bottom: 30px;
-}
+  }
+
   left: 46.5%;
   height: 45px;
   border-bottom: 1px solid #5e5e5e;
 }
-.filter-button
-{
+
+.filter-button {
   font-size: 18px;
   border: 1px solid #42B32F;
   border-radius: 5px;
@@ -112,8 +127,8 @@ h1 { font-size: 1.5em; margin: 10px; }
   margin-bottom: 30px;
 
 }
-.filter-button:hover
-{
+
+.filter-button:hover {
   font-size: 18px;
   border: 1px solid #42B32F;
   border-radius: 5px;
@@ -122,24 +137,22 @@ h1 { font-size: 1.5em; margin: 10px; }
   background-color: #42B32F;
 
 }
-.btn-default:active .filter-button:active
-{
+
+.btn-default:active .filter-button:active {
   background-color: #42B32F;
   color: white;
 }
 
-.port-image
-{
+.port-image {
   width: 100%;
 }
 
-.gallery_product
-{
+.gallery_product {
   margin-bottom: 30px;
   position: relative;
 }
 
-.edit_button_on_image{
+.edit_button_on_image {
   position: absolute;
   top: 0%;
   right: 0%;
@@ -208,4 +221,8 @@ h1 { font-size: 1.5em; margin: 10px; }
 .modal-leave-active .modal-container {
   -webkit-transform: scale(1.1);
   transform: scale(1.1);
+}
+
+.email_show {
+  word-break: break-all;
 }

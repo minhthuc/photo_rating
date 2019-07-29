@@ -1,7 +1,7 @@
 <section>
   <div class="container" id="home_element">
     <div class="row">
-      <div class="col-md-8">
+      <div class="col-md-12">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h3 class="panel-title">Wall</h3>
@@ -40,12 +40,13 @@
                 <a href="profile.html"
                    class="post-avatar thumbnail">
                   <%= image_tag("user.png") %>
-                  <div class="text-center">{{photo.user_email}}</div>
+                  <div class="text-center email_show">{{photo.user_email}}</div>
                 </a>
               </div>
               <div class="col-sm-10 col-md-8 col-8">
                 <div class="pointer text-center">
-                  <img v-bind:src="photo.location" v-bind:alt="photo.title" @contextmenu.prevent="context(index, TYPE.PHOTO)">
+                  <img v-bind:src="photo.location" v-bind:alt="photo.title"
+                     @contextmenu.prevent="context(index, TYPE.PHOTO)" class="img-responsive">
                 </div>
                 <div class="pointer-border">
                   <h4 class="text-center">
@@ -79,54 +80,15 @@
 
                 <div class="clearfix"></div>
 
-                <form>
+<!--                <form>-->
                   <div class="input-group">
-                    <input type="text" class="form-control" name="email" placeholder="Your comments" v-model="photo.comment_content">
-                    <span class="input-group-addon" v-on:click="comment(index)" v-on:keyup.enter="comment(index)"><i class="fas fa-paper-plane"></i></span>
+                    <input type="text" class="form-control" placeholder="Your comments"
+                      v-model="photo.comment_content" v-on:keyup.enter="comment(index)">
+                    <span class="input-group-addon" v-on:click="comment(index)"><i class="fas fa-paper-plane"></i></span>
                   </div>
-                </form>
+<!--                </form>-->
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="panel panel-default friends">
-          <div class="panel-heading">
-            <h3 class="panel-title">My Friends</h3>
-          </div>
-          <div class="panel-body">
-            <div class="clearfix"></div>
-            <a class="btn btn-primary" href="#">View All Friends</a>
-          </div>
-        </div>
-        <div class="panel panel-default groups">
-          <div class="panel-heading">
-            <h3 class="panel-title">Latest Groups</h3>
-          </div>
-          <div class="panel-body">
-            <div class="group-item">
-              <!--              <img src="images/group.png" alt="">-->
-              <h4><a href="#" class="">Sample Group One</a></h4>
-              <p>This is a paragraph of intro text, or whatever I
-                want to call it.</p>
-            </div>
-            <div class="clearfix"></div>
-            <div class="group-item">
-              <!--              <img src="images/group.png" alt="">-->
-              <h4><a href="#" class="">Sample Group Two</a></h4>
-              <p>This is a paragraph of intro text, or whatever I
-                want to call it.</p>
-            </div>
-            <div class="clearfix"></div>
-            <div class="group-item">
-              <!--              <img src="images/group.png" alt="">-->
-              <h4><a href="#" class="">Sample Group Three</a></h4>
-              <p>This is a paragraph of intro text, or whatever I
-                want to call it.</p>
-            </div>
-            <div class="clearfix"></div>
-            <a href="#" class="btn btn-primary">View All Groups</a>
           </div>
         </div>
       </div>
@@ -169,12 +131,10 @@
         setRating: function (rating, index) {
           let self = this;
           let photo_id = self.photos[index].id;
-          rating = Math.ceil(rating)
           self.photos[index].loading = true;
           $.post("/vote", {photo_id, rating}).done(function (respone) {
-            self.photos[index].photo_score = parseInt(respone)
+            self.photos[index].score = parseFloat(respone)
             self.photos[index].loading = false;
-            console.log(respone)
           }).error(er => {
             console.log(er)
           })
@@ -184,6 +144,7 @@
           if (!self.is_edit) {
             let photo_id = self.photos[index_photo].id;
             let content = self.photos[index_photo].comment_content;
+            if (content.trim().length == 0) return;
             self.photos[index_photo].comment_content = "";
             $.post("/comments", {
               comment: {
