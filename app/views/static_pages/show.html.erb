@@ -49,9 +49,6 @@
             </div>
 
           </div>
-          <div v-for="(photo, index) in photos" class="panel panel-default post">
-
-          </div>
         </div>
       </div>
 
@@ -118,6 +115,7 @@
           let self = this;
           return new Promise((resolve, reject) => {
             $.get("/photo", {id: photo.id}).done(response => {
+              response.categories = response.categories.map(f=>f.id);
               self.photo_choose = response;
               return resolve()
             }).error(err => {
@@ -130,10 +128,6 @@
           return new Promise((resolve, reject) => {
             $.get("/categories/get").done(response => {
               console.log(response)
-              // response = response.map(c=>{
-              //   c.value = c.id;
-              //   c.label = c.name;
-              // })
               self.categories = response
               return resolve(response)
             }).error(er => {
@@ -144,14 +138,20 @@
         update() {
           let self = this;
           let photo = self.photo_choose;
+          if (!photo.categories || photo.categories.length === 0){
+            return self.$notify({
+              title: "fails",
+              message: "Photo must have at least a category"
+            })
+          }
           $.post("/photo/update", {photo}).done(response => {
             if (response.code === 1) {
-              return this.$notify({
+              return self.$notify({
                 text: "success",
                 message: "update succesfully"
               })
             } else {
-              return this.$notify({
+              return self.$notify({
                 text: "error",
                 message: "update unsuccesfully"
               })

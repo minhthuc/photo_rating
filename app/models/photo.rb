@@ -24,7 +24,7 @@ class Photo < ActiveRecord::Base
     else
       rates = self.rates
       score = rates.empty? ? 0 : rates.average(:score)
-      self.photo_score = score.round(1)
+      self.photo_score = score
       self.is_update_score = true
       save
       score

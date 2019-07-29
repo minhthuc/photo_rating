@@ -1,9 +1,16 @@
 class PhotosController < ApplicationController
   NO_COMENT = "nc"
 
-  protect_from_forgery except: [:update]
+  protect_from_forgery except: [:update, :create]
 
-  before_action :get_photo, only: [:show, :find_photo]
+  before_action :get_photo, only: [:show, :find_photo, :create]
+
+  SEC = 1
+  MIN = 60 * SEC
+  HOUR = 60 * MIN
+  DAY = 24 * HOUR
+  MONTH = 30 * DAY
+  YEAR = 365 * DAY
 
   def show
     unless @photo
@@ -13,10 +20,9 @@ class PhotosController < ApplicationController
   end
 
   def create
-    file = photo_params[:location]
+    file = params[:location]
     dir = "#{Rails.root}/public/images/users/#{current_user.id}/"
     Dir.mkdir(dir) unless Dir.exist?(dir)
-
     if file.nil?
       flash[:error] = "You need to upload an image!"
     else
@@ -24,15 +30,27 @@ class PhotosController < ApplicationController
         f.write(file.read)
       end
       location = "/images/users/#{current_user.id}/#{file.original_filename}"
-      photo = current_user.photos.new(photo_params)
+      photo = current_user.photos.new()
       photo.location = "#{location}"
+      photo.title = params[:title]
+      photo.description = params[:description]
+      _categories = params[:categories].split(",")
+      categories = []
+      _categories.each do |cat|
+        _category = Category.find(cat)
+        categories.push(_category)
+      end
       if photo.save
-        flash[:success] = "Your Photo upload completed"
+        photo.categories = categories
+        if photo.save
+          render json: { code: 1, message: "Your post is created!", photo: photo }
+        else
+          render json: { code: 0, message: "Your post is not created!" }
+        end
       else
-        flash[:error] = "Can not push your post!"
+        render json: { code: 0, message: "Your post is not created!" }
       end
     end
-    redirect_to root_path
   end
 
   def get_photos
@@ -48,17 +66,21 @@ class PhotosController < ApplicationController
       photos = Photo.where(ar).limit(limit).offset(pages)
     end
     user_hash = Hash.new
+    now = Time.now
     photos.each do |photo|
       comments = photo.comments.limit(3).reverse unless photo_query[:options] || photo_query[:options] == NO_COMENT
+
       unless user_hash["#{photo.user.id}"]
         tmp = photo.user
         user_hash["#{photo.user.id}"] = tmp
       end
       tmp_photo_hash = { title: photo[:title], location: photo[:location],
                          description: photo[:description], score: photo[:photo_score], id: photo.id }
+      time = time_ago_in_word(photo.created_at, now)
       tmp_photo_hash["user_email"] = user_hash["#{photo.user.id}"].email
       tmp_photo_hash["user_id"] = user_hash["#{photo.user.id}"][:id]
       tmp_photo_hash["comments"] = comments unless photo_query[:options] || photo_query[:options] == NO_COMENT
+      tmp_photo_hash["created"] = time
       @photos.push tmp_photo_hash
     end
     render json: @photos
@@ -107,4 +129,26 @@ class PhotosController < ApplicationController
   def get_photo
     @photo = Photo.find_by(id: params[:photo] ? params[:photo][:id].to_i : params[:id].to_i)
   end
+
+  def time_ago_in_word frist, second
+    x = second - frist
+    x = x.to_i
+    case x
+    when 0..SEC
+      "now"
+    when SEC..MIN
+      "a min ago"
+    when MIN..HOUR
+      "#{(x / MIN).to_i} mins ago"
+    when HOUR..DAY
+      "#{(x / HOUR).to_i} hours ago"
+    when DAY..MONTH
+      "#{(x / DAY).to_i} days ago"
+    when MONTH..YEAR
+      "#{(x / MONTH).to_i} months ago"
+    else
+      "#{(x / YEAR).to_i} years ago"
+    end
+  end
+
 end
